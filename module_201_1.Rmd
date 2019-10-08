@@ -24,8 +24,8 @@ The material provided includes text to read, video demonstrations, an example R 
 
 ### Learning Objectives for Module 1
 * Understand tidy data 
-* Use dplyr to reformat data
-* Use dplyr to summarise data
+* Understand data analysis workflows 
+* Use the dplyr package to reformat and summarize data
 * Create bar plots, box & whisker plots and violin plots with ggplot2
 
 
@@ -69,6 +69,8 @@ Our workflow is
 3. Transform or summarise
 4. Visualize
 
+![Data Analysis Workflow](https://github.com/hadley/r4ds/blob/master/diagrams/data-science-communicate.png)
+
 
 ### Importing our data in R
 ##### First video - importing and tidying our data 
@@ -87,7 +89,7 @@ If you look at the R-Studio environment window, you will see that the object
 data has appeared there.
 
 ### Tidy our data
-The data is in a wide format `r View(data)`. Each observation is in a column. 
+The data is in a wide format. Each observation is in a column. 
 This is how we are used to seeing our data and we could graph it like this. 
 However, things will work better if we turn the data into long format that is
 more of the structure we like for Tidy Data. 
@@ -133,20 +135,20 @@ data using geom_bar.
 Here is the code to do this
 
 ```{r barchart}
-# bar chart plot
+# bar chart plot with the mean of each column...
 ggplot(data_3, aes(key, value)) +
-    geom_bar(stat="identity") 
-
+    geom_bar(stat = "summary", fun.y = "mean") 
 ```
 
 Why do we like barplots? Well, our eyes interpret the y axis quite easily. 
-We can differentiate the sizes of the numbers. It's not clear that it is much 
-better than just the numbers but we do like to visualise the data. 
+We can differentiate the sizes of the numbers. We like bar charts in 
+biochemistry. However, is it much better than just the numbers?
+
 
 ### Summarize as lines or show the individual data points
-However, it has limits and there is a proposition that is hides more than it 
-reveals and that is uses a lot of ink for showing the numbers. For example, 
-it is not really better than just generating lines with now bars...
+Bar charts have limits and there is a proposition they hide more than they 
+reveal. Bar charts use a lot of ink for showing the numbers. For example, 
+it is not really better than just generating lines without the bars...
 We can use the group_by() and summarise() functions in our first piped workflow.
 Then we can plot the calculated means as lines. 
 
@@ -155,18 +157,27 @@ Then we can plot the calculated means as lines.
 # bar chart plot
 data_3 %>%
     group_by(key) %>%
-    summarise(mean(value)) -> data_3_stats
-colnames(data_3_stats) <- c("key", "value")
+    summarise(mean(value), sd(value)) -> data_3_stats
+colnames(data_3_stats) <- c("key", "value", "sd")
 
 # create plot with summary data...
 # add the mean value as a line
 ggplot(data_3_stats, aes(key, value)) + 
     geom_point(shape = 95, size = 8)
 
+# we can also use the mean and standard deviation to add a error bar
+# to this or to our bar chart...
+
+# bar chart plot
+ggplot(data_3, aes(key, value)) +
+    geom_bar(stat = "summary", fun.y = "mean") +
+    geom_errorbar(data = data_3_stats, aes(ymin=value-sd, ymax=value+sd), width=.2,
+                 position=position_dodge(.9)) 
 ```
 
-I have to confess that I don't really like this. What can we do better?
-Well we can show the points to show the variation. 
+I have to confess that I don't really like either of these plots. 
+What can we do better? Well we can show the points to show the variation 
+using geom_jitter().
 
 ```{r geom_jitter}
 # then add points with geom_jitter()
