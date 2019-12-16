@@ -1,0 +1,13 @@
+---
+title: "Favourite Molecules"
+author: "Paul Brennan"
+date: "16/12/2019"
+output: html_document
+---
+
+
+## This is a trial file to encourage leaners to add a little information. 
+
+My favourite molecule in NF-kappaB. 
+Here is the Uniprot Page for the Rel A subunit of NF-kappaB. 
+
